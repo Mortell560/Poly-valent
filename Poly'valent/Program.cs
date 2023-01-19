@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Poly_Valent
+namespace Poly_valent
 {
     class Program
     {

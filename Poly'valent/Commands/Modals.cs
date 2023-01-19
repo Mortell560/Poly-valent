@@ -4,20 +4,21 @@ namespace Poly_valent.Commands
 {
     public class Modals : InteractionModuleBase<SocketInteractionContext>
     {
-        [SlashCommand("AddToEDTUpdates", "The bot will warn you about edt changes")]
-        public async Task AddEDTPerson() => await Context.Interaction.RespondWithModalAsync<AddEDT>("addEDT");
+        [SlashCommand("addtoedtupdates", "The bot will warn you about edt changes")]
+        public async Task AddEDTPerson() => await Context.Interaction.RespondWithModalAsync<AddEDT>("addedt");
 
-        [ModalInteraction("addEDT")]
+        //TODO: bah faire la db et la methode ici
+        [ModalInteraction("addedt")]
         public async Task ModalResponse(AddEDT modal)
         {
-            await RespondAsync("aaa");
+            await RespondAsync($"aaa{modal.Id}");
         }
 
         public class AddEDT : IModal
         {
             public string Title => "Ajout newsletter edt";
 
-            [InputLabel("Votre id? (utilise la commande /help_edt pour savoir comment le trouver si c'est la première fois)")]
+            [InputLabel("Votre id? /help_edt for help")]
             [ModalTextInput("Id", placeholder: "AAAA", minLength:1, maxLength:7)]
             public string? Id { get; set; }
         }

@@ -17,14 +17,14 @@ namespace Poly_valent.Utils
                     { "620", r620 }
                 };
 
-        private Calendar GetEDT(int id, DateTime dateS, DateTime dateF)
+        public static Calendar GetEDT(int id, DateTime dateS, DateTime dateF)
         {
             string url = $"https://ade-planning.polytech.universite-paris-saclay.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources={id}&projectId=5&calType=ical&lastDate={dateF.Year}-{dateF.Month}-{dateF.Day}&firstDate={dateS.Year}-{dateS.Month}-{dateS.Day}";
             Calendar c = Calendar.Load(GetAsync(url));
             return c;
         }
 
-        private string GetAsync(string uri)
+        public static string GetAsync(string uri)
         {
             using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
             {
@@ -35,13 +35,13 @@ namespace Poly_valent.Utils
             }
         }
 
-        private string GetEDTString(int id, DateTime dateS, DateTime dateF)
+        public static string GetEDTString(int id, DateTime dateS, DateTime dateF)
         {
             string url = $"https://ade-planning.polytech.universite-paris-saclay.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources={id}&projectId=5&calType=ical&lastDate={dateF.Year}-{dateF.Month}-{dateF.Day}&firstDate={dateS.Year}-{dateS.Month}-{dateS.Day}";
             return GetAsync(url);
         }
 
-        private CalendarEvent? nextClass(Calendar c, DateTime date)
+        public static CalendarEvent? nextClass(Calendar c, DateTime date)
         {
             List<CalendarEvent> events = new List<CalendarEvent>();
             foreach (CalendarEvent e in c.Events)
@@ -59,7 +59,7 @@ namespace Poly_valent.Utils
             return null;
         }
 
-        private List<string> FindCurrentlyOccupiedRoom(List<string> bats, DateTime d)
+        public static List<string> FindCurrentlyOccupiedRoom(List<string> bats, DateTime d)
         {
             List<string> rooms = new();
             foreach (string bat in bats)

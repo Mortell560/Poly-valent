@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Poly_Valent
+namespace Poly_valent
 {
     public struct ConfigJson
     {
