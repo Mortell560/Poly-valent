@@ -1,6 +1,4 @@
-﻿using Discord;
-using Discord.Interactions;
-
+﻿using Discord.Interactions;
 
 namespace Poly_valent.Commands
 {

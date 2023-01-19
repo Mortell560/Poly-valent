@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System.Net;
+
 namespace Poly_valent.Utils
 {
     internal class Grades

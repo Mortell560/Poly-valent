@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
-namespace Poly
+namespace Poly_Valent
 {
     public class CommandHandler : DiscordClientService
     {
