@@ -12,7 +12,7 @@ namespace Poly_valent.Commands
         [ModalInteraction("addEDT")]
         public async Task ModalResponse(AddEDT modal)
         {
-            
+            await RespondAsync("aaa");
         }
 
         public class AddEDT : IModal
