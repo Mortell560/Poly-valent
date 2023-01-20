@@ -9,15 +9,11 @@ namespace Poly_valent.Commands
     public class HelpCommands : ModuleBase<SocketCommandContext>
     {
         private readonly CommandService _service;
-        private readonly DiscordSocketClient _client;
         private readonly IConfiguration _config;
-        private readonly IHost _host;
 
-        public HelpCommands(CommandService service, DiscordSocketClient client, IHost host, IConfiguration config)
+        public HelpCommands(CommandService service, IConfiguration config)
         {
             _service = service;
-            _client = client;
-            _host = host;
             _config = config;
         }
 
@@ -88,13 +84,5 @@ namespace Poly_valent.Commands
             await ReplyAsync("", false, builder.Build());
         }
 
-        [Command("shut", RunMode = RunMode.Async)]
-        [Summary("Makes bonapio shut")]
-        [RequireOwner]
-        public async Task Exit()
-        {
-            await _client.LogoutAsync();
-            await _host.StopAsync();
-        }
     }
 }
