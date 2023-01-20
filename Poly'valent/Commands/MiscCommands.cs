@@ -77,6 +77,8 @@ namespace Poly_valent.Commands
         [RequireOwner]
         public async Task Exit()
         {
+            await DeferAsync();
+            await FollowupAsync("im ded");
             await _client.LogoutAsync();
             await _host.StopAsync();
         }
