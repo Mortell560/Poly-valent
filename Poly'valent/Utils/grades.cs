@@ -1,11 +1,12 @@
 ﻿using HtmlAgilityPack;
+using System.Globalization;
 using System.Net;
 
 namespace Poly_valent.Utils
 {
     internal class Grades
     {
-        private async Task<List<Course>> GetGrades(string LOGIN, string PASSWORD)
+        public static async Task<List<Course>> GetGrades(string LOGIN, string PASSWORD, int s)
         {
             using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
             {
@@ -29,58 +30,64 @@ namespace Poly_valent.Utils
                 response = await client.GetAsync(url);
                 HtmlDocument html = new HtmlDocument();
                 html.LoadHtml(await response.Content.ReadAsStringAsync());
-
+                HtmlNodeCollection coursesHTML = html.DocumentNode.ChildNodes;
                 List<Course> courses = new List<Course>();
-                var coursesHTML = html.DocumentNode.Ancestors("tr")
-                    .Where(x => x.HasClass("courseLine"))
-                    .ToList();
+
+                if (html.DocumentNode.SelectSingleNode("//table[@id='Tests12022']").SelectSingleNode("./tbody").ChildNodes.Count == 1)
+                {
+                    return courses;
+                }
+                if (s == 1 || s == 3)
+                {
+                    coursesHTML = html.DocumentNode.SelectSingleNode("//table[@id='Tests12022']").SelectSingleNode("./tbody").SelectNodes("./tr");
+
+                    if (s == 3)
+                    {
+                        if (!(html.DocumentNode.SelectSingleNode("//table[@id='Tests22022']").SelectSingleNode("./tbody").ChildNodes.Count == 1))
+                        {
+                            coursesHTML.Concat(html.DocumentNode.SelectSingleNode("//table[@id='Tests22022']").SelectSingleNode("./tbody").SelectNodes("./tr"));
+                        }
+                    }
+                }
+
+                if (s == 2)
+                {
+                    if (html.DocumentNode.SelectSingleNode("//table[@id='Tests22022']").SelectSingleNode("./tbody").ChildNodes.Count == 1){
+                        return courses;
+                    }
+                    coursesHTML = html.DocumentNode.SelectSingleNode("//table[@id='Tests22022']").SelectSingleNode("./tbody").SelectNodes("./tr");
+                }
 
                 foreach (var course_html in coursesHTML)
                 {
-                    string? subject, subject_id, name, date_str, grade;
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                    subject_id = course_html.Descendants("td")
-                        .ElementAt(0)
-                        .Descendants("div")
-                        .ToString()
-                        .Split("\n")
-                        .ElementAt(1)
-                        .Trim()
-                        .SkipLast(2)
-                        .ToString();
+                    string? subject, subject_id, name, date_str, grade, appr, avg, rank;
+                    subject_id = course_html.SelectSingleNode("./td/div").Attributes["data-code"].Value;
 
-                    subject = course_html.Descendants("td")
-                        .ElementAt(0)
-                        .Descendants("div")
-                        .ToString()
-                        .Split("\n")
-                        .ElementAt(3)
-                        .Trim();
+                    subject = course_html.SelectSingleNode("./td/div/b").InnerText.Trim();
 
+                    name = course_html.SelectSingleNode("./td[2]").InnerText.Trim();
 
-                    name = course_html.Descendants("td")
-                        .ElementAt(0)
-                        .Descendants("div")
-                        .ToString()
-                        .Split("\n")
-                        .ElementAt(3)
-                        .Trim();
+                    date_str = course_html.SelectSingleNode("./td[3]").InnerText.Trim();
 
-                    grade = course_html.Descendants("td")
-                        .ElementAt(3)
-                        .ToString()
-                        .Trim();
+                    grade = course_html.SelectSingleNode("./td[4]").InnerText.Trim();
 
-                    date_str = course_html.Descendants("td")
-                        .ElementAt(2)
-                        .ToString()
-                        .Trim();
+                    avg = course_html.SelectSingleNode("./td[5]").InnerText.Trim();
+                    
+                    rank = course_html.SelectSingleNode("./td[6]").InnerText.Trim();
 
-                    Course c = new Course(name, subject, subject_id, float.Parse(grade.Replace(',', '.')), date_str);
+                    appr = course_html.SelectSingleNode("./td[7]").InnerText.Trim();
+
+                    // C'est un peu Ohio mais si on met un breakpoint mais en fait tout est decale de 1 pour aucune raison valide
+
+                    grade = grade.Replace(',', '.');
+                    avg = avg.Replace(',', '.');
+                    bool g, a;
+                    g = float.TryParse(grade, NumberStyles.Float, CultureInfo.InvariantCulture, out float g_d);
+                    a = float.TryParse(avg, NumberStyles.Float, CultureInfo.InvariantCulture, out float a_d);
+
+                    Course c = new Course(name, subject, subject_id, g ? g_d : -1.0f, a ? a_d : -1.0f, rank, date_str, appr);
                     courses.Add(c);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
                 }
-
                 return courses;
             }
 

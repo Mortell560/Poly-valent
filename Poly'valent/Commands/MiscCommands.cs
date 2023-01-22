@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Poly_valent.Utils;
 
@@ -12,24 +13,26 @@ namespace Poly_valent.Commands
     {
         private readonly DiscordSocketClient _client;
         private readonly IHost _host;
+        private readonly IConfiguration _configuration;
 
-        public MiscCommands(DiscordSocketClient client, IHost host)
+        public MiscCommands(DiscordSocketClient client, IHost host, IConfiguration configuration)
         {
             _client = client;
             _host = host;
+            _configuration = configuration;
         }
 
 
         [SlashCommand("nextclass", "tells you your next class", false, RunMode.Async)]
         public async Task NextClass(int id)
         {
-            Calendar c = Utils.cal.GetEDT(id, DateTime.Now, DateTime.Now.AddDays(3));
+            Calendar c = cal.GetEDT(id, DateTime.Now, DateTime.Now.AddDays(3));
             if (c == null)
             {
                 await RespondAsync("Tu n'as pas de cours pour 3j au moins");
                 return;
             }
-            CalendarEvent? e = Utils.cal.nextClass(c, DateTime.Now);
+            CalendarEvent? e = cal.nextClass(c, DateTime.Now);
 
             if(e == null)
             {
@@ -72,8 +75,29 @@ namespace Poly_valent.Commands
             await FollowupAsync(null, embed: builder.Build());
         }
 
+        [SlashCommand("getcourses", "Owner only")]
+        [RequireOwner]
+        public async Task GetCoursesAsync(int s)
+        {
+            await DeferAsync();
+#pragma warning disable CS8604 // Possible null reference argument.
+            List<Course> c = await Grades.GetGrades(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+#pragma warning restore CS8604 // Possible null reference argument.
+            string desc = "";
+            c = c.OrderBy(x => x._date).ToList();
+            foreach (var course in c)
+            {
+                desc += course.ToString() + "\n";
+            }
+            EmbedBuilder b = new EmbedBuilder()
+                .WithTitle("Tes notes:")
+                .WithDescription(desc)
+                .WithFooter($"Command executed by {Context.User.Username} at {DateTime.Now}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+            await FollowupAsync(null, embed: b.Build(), ephemeral: true);
+        }
 
-        [SlashCommand("shut", "shuts the bot",false, RunMode.Async)]
+
+        [SlashCommand("shut", "shuts the bot", false, RunMode.Async)]
         [RequireOwner]
         public async Task Exit()
         {
