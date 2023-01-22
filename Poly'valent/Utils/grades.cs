@@ -6,7 +6,7 @@ namespace Poly_valent.Utils
 {
     internal class Grades
     {
-        public static async Task<List<Course>> GetGrades(string LOGIN, string PASSWORD, int s)
+        public static async Task<List<Test>> GetGrades(string LOGIN, string PASSWORD, int s)
         {
             using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
             {
@@ -31,7 +31,7 @@ namespace Poly_valent.Utils
                 HtmlDocument html = new HtmlDocument();
                 html.LoadHtml(await response.Content.ReadAsStringAsync());
                 HtmlNodeCollection coursesHTML = html.DocumentNode.ChildNodes;
-                List<Course> courses = new List<Course>();
+                List<Test> courses = new List<Test>();
 
                 if (html.DocumentNode.SelectSingleNode("//table[@id='Tests12022']").SelectSingleNode("./tbody").ChildNodes.Count == 1)
                 {
@@ -85,7 +85,7 @@ namespace Poly_valent.Utils
                     g = float.TryParse(grade, NumberStyles.Float, CultureInfo.InvariantCulture, out float g_d);
                     a = float.TryParse(avg, NumberStyles.Float, CultureInfo.InvariantCulture, out float a_d);
 
-                    Course c = new Course(name, subject, subject_id, g ? g_d : -1.0f, a ? a_d : -1.0f, rank, date_str, appr);
+                    Test c = new Test(name, subject, subject_id, g ? g_d : -1.0f, a ? a_d : -1.0f, rank, date_str, appr);
                     courses.Add(c);
                 }
                 return courses;

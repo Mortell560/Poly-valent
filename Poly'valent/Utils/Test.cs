@@ -1,6 +1,6 @@
 ﻿namespace Poly_valent.Utils
 {
-    internal class Course
+    internal class Test
     {
         private List<string> months = new() { "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre" };
 
@@ -15,7 +15,7 @@
         public string? _rank;
         public DateTime? _date;
 
-        public Course(string? name, string? subject, string? subject_id, float? grade, float? class_avg, string? rank ,string date_str, string? appr)
+        public Test(string? name, string? subject, string? subject_id, float? grade, float? class_avg, string? rank ,string date_str, string? appr)
         {
             _name = name;
             _subject = subject;

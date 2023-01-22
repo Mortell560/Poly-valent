@@ -77,14 +77,20 @@ namespace Poly_valent.Commands
 
         [SlashCommand("getcourses", "Owner only")]
         [RequireOwner]
-        public async Task GetCoursesAsync(int s)
+        public async Task GetCoursesAsync(int s, string? sortName = null)
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
-            List<Course> c = await Grades.GetGrades(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+            List<Test> c = await Grades.GetGrades(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
 #pragma warning restore CS8604 // Possible null reference argument.
             string desc = "";
             c = c.OrderBy(x => x._date).ToList();
+            if (sortName != null)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                c = c.FindAll(x => x._subject.Contains(sortName));
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
             foreach (var course in c)
             {
                 desc += course.ToString() + "\n";
