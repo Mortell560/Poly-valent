@@ -39,10 +39,9 @@ namespace Poly_valent.Commands
                 await RespondAsync("Tu n'as pas de prochains cours");
                 return;
             }
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
             string descTemp = e.Description.Remove(0,2);
             string[] desc = descTemp.Split('\n');
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
             EmbedBuilder b = new EmbedBuilder()
                 .WithTitle("Prochain cours:")
                 .AddField("Cours", e.Summary, false)
@@ -75,9 +74,9 @@ namespace Poly_valent.Commands
             await FollowupAsync(null, embed: builder.Build());
         }
 
-        [SlashCommand("getcourses", "Owner only")]
+        [SlashCommand("gettests", "Owner only")]
         [RequireOwner]
-        public async Task GetCoursesAsync(int s, string? sortName = null)
+        public async Task GetTestsAsync(int s, string? sortName = null)
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -100,6 +99,16 @@ namespace Poly_valent.Commands
                 .WithDescription(desc)
                 .WithFooter($"Command executed by {Context.User.Username} at {DateTime.Now}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
             await FollowupAsync(null, embed: b.Build(), ephemeral: true);
+        }
+
+        [SlashCommand("getmodules", "Owner only")]
+        [RequireOwner]
+        public async Task GetModulesAsync(int s, string? sortName = null)
+        {
+            await DeferAsync();
+#pragma warning disable CS8604 // Possible null reference argument.
+            Dictionary<string, List<Module>> c = await Grades.GetModules(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+#pragma warning restore CS8604 // Possible null reference argument.
         }
 
 
