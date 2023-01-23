@@ -107,8 +107,52 @@ namespace Poly_valent.Commands
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
-            Dictionary<string, List<Module>> c = await Grades.GetModules(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+            Dictionary<string, List<Module>> d = await Grades.GetModules(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
 #pragma warning restore CS8604 // Possible null reference argument.
+            string desc = "";
+            if (sortName != null)
+            {
+                d = d.Where(x => x.Key.Contains(sortName)).ToDictionary(x => x.Key, x => x.Value);
+            }
+            foreach (string key in d.Keys){
+                desc += $"**{key}**\n";
+                foreach (Module m in d[key])
+                {
+                    desc += m.ToString() + "\n";
+                }
+            }
+            EmbedBuilder b = new EmbedBuilder()
+                .WithTitle("Tes modules:")
+                .WithDescription(desc)
+                .WithFooter($"Command executed by {Context.User.Username} at {DateTime.Now}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+            await FollowupAsync(null, embed: b.Build(), ephemeral: true);
+        }
+
+        [SlashCommand("getues", "Owner only")]
+        [RequireOwner]
+        public async Task GetUesAsync(int s, string? sortName = null)
+        {
+            await DeferAsync();
+#pragma warning disable CS8604 // Possible null reference argument.
+            List<UE> c = await Grades.GetUE(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+#pragma warning restore CS8604 // Possible null reference argument.
+            string desc = "";
+            c = c.OrderBy(x => x._code).ToList();
+            if (sortName != null)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                c = c.FindAll(x => x._name.Contains(sortName));
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+            foreach (UE ue in c)
+            {
+                desc += ue.ToString() + "\n";
+            }
+            EmbedBuilder b = new EmbedBuilder()
+                .WithTitle("Tes UEs:")
+                .WithDescription(desc)
+                .WithFooter($"Command executed by {Context.User.Username} at {DateTime.Now}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+            await FollowupAsync(null, embed: b.Build(), ephemeral: true);
         }
 
 

@@ -6,6 +6,7 @@ namespace Poly_valent.Utils
 {
     internal class Grades
     {
+        const string dash = "&mdash;";
         public static async Task<List<Test>> GetGrades(string LOGIN, string PASSWORD, int s)
         {
             using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
@@ -28,10 +29,10 @@ namespace Poly_valent.Utils
                 string url = baseUrl + "prod/bo/core/Router/Ajax/ajax.php?targetProject=oasis_polytech_paris&route=BO\\Layout\\MainContent::load&codepage=MYMARKS";
 
                 response = await client.GetAsync(url);
-                HtmlDocument html = new HtmlDocument();
+                HtmlDocument html = new();
                 html.LoadHtml(await response.Content.ReadAsStringAsync());
                 HtmlNodeCollection coursesHTML = html.DocumentNode.ChildNodes;
-                List<Test> courses = new List<Test>();
+                List<Test> courses = new();
                 string currYear = await GetCurrentSchoolYear(LOGIN, PASSWORD);
 
                 if (html.DocumentNode.SelectSingleNode($"//table[@id='Tests1{currYear}']").SelectSingleNode("./tbody").ChildNodes.Count == 1)
@@ -46,7 +47,10 @@ namespace Poly_valent.Utils
                     {
                         if (!(html.DocumentNode.SelectSingleNode($"//table[@id='Tests2{currYear}']").SelectSingleNode("./tbody").ChildNodes.Count == 1))
                         {
-                            coursesHTML.Concat(html.DocumentNode.SelectSingleNode($"//table[@id='Tests2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr"));
+                            foreach (HtmlNode? node in html.DocumentNode.SelectSingleNode($"//table[@id='Tests2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr"))
+                            {
+                                coursesHTML.Add(node); // concat doesn't work for some reason
+                            }
                         }
                     }
                 }
@@ -59,7 +63,7 @@ namespace Poly_valent.Utils
                     coursesHTML = html.DocumentNode.SelectSingleNode($"//table[@id='Tests2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr");
                 }
 
-                foreach (var course_html in coursesHTML)
+                foreach (HtmlNode? course_html in coursesHTML)
                 {
                     string? subject, subject_id, name, date_str, grade, appr, avg, rank;
                     subject_id = course_html.SelectSingleNode("./td/div").Attributes["data-code"].Value;
@@ -131,27 +135,107 @@ namespace Poly_valent.Utils
                     modulesHTML = html.DocumentNode.SelectSingleNode($"//table[@id='Courses1{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr");
                     if (s == 3)
                     {
-                        modulesHTML.Concat(html.DocumentNode.SelectSingleNode($"//table[@id='Courses2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr"));
+                        foreach (HtmlNode? node in html.DocumentNode.SelectSingleNode($"//table[@id='Courses2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr"))
+                        {
+                            modulesHTML.Add(node);
+                        }
                     }
                 }
 
-                foreach (var moduleN in modulesHTML )
+                foreach (HtmlNode? moduleN in modulesHTML)
                 {
-                    if (moduleN.HasClass("info c-pointer"))
+
+                    var modules = moduleN.SelectNodes("./td");
+                    
+                    //foreach (var item in modules)
+                    //{
+                    //    Console.WriteLine(item.InnerText.Trim());
+                    //}
+                    if (!d.ContainsKey(modules.ElementAt(0).InnerText.Trim().Replace(dash, "-")))
                     {
-                        d.Add(moduleN.SelectSingleNode("./td/div").Attributes["data-code"].Value + moduleN.SelectSingleNode("./td/div/b").InnerText.Trim(), new List<Module>());
+                        d.Add(modules.ElementAt(0).InnerText.Trim().Replace(dash, "-"), new List<Module>());
                     }
-                    else
-                    {
-                        string? name, moduleID, block, rank, S;
-                        float? coef, grade, avg;
-                        //string k = d.Keys.Where(x => x.Contains(moduleID.Length == 6 ? moduleID.Remove(4) : block.Remove(4))).First();
-                    }
+                    string? name, moduleID, block, rank, S;
+
+                    moduleID = modules.ElementAt(1).InnerText.Trim();
+                    name = modules.ElementAt(2).InnerText.Trim();
+                    bool f_d = float.TryParse(modules.ElementAt(3).InnerText.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out float coef);
+                    block = modules.ElementAt(4).InnerText.Trim() == dash ? "-" : modules.ElementAt(4).InnerText.Trim();
+                    bool g_b = float.TryParse(modules.ElementAt(5).SelectSingleNode("./span").InnerText.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out float grade); // don't ask me why they put a span there
+                    bool a_b = float.TryParse(modules.ElementAt(6).InnerText.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out float avg);
+                    rank = modules.ElementAt(7).InnerText.Trim();
+                    S = modules.ElementAt(8).InnerText.Trim() == dash ? "-" : modules.ElementAt(8).InnerText.Trim();
+
+                    string k = d.Keys.Where(x => x.Contains(moduleID.Length == 6 ? moduleID.Remove(4) : block.Remove(4))).First();
+                    d[k].Add(new Module(name, moduleID, f_d ? coef : -1.0f, block, g_b ? grade : -1.0f, a_b ? avg : -1.0f, rank, S));
+                
 
                 }
 
                 return d;
 
+            }
+        }
+
+        public static async Task<List<UE>> GetUE(string LOGIN, string PASSWORD, int s)
+        {
+            using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
+            {
+                string baseUrl = "https://oasis.polytech.universite-paris-saclay.fr/";
+                string url1 = baseUrl + "prod/bo/core/Router/Ajax/ajax.php?targetProject=oasis_polytech_paris&route=BO\\Connection\\User::login";
+                client.BaseAddress = new Uri(url1);
+                await client.GetAsync(client.BaseAddress);
+
+                Dictionary<string, string> values = new Dictionary<string, string>
+                {
+                    { "login", LOGIN },
+                    { "password", PASSWORD },
+                    { "codepage", "MYMARKS"}
+                };
+
+                var content = new FormUrlEncodedContent(values);
+
+                var response = await client.PostAsync(client.BaseAddress, content);
+                string url = baseUrl + "prod/bo/core/Router/Ajax/ajax.php?targetProject=oasis_polytech_paris&route=BO\\Layout\\MainContent::load&codepage=MYMARKS";
+
+                response = await client.GetAsync(url);
+                HtmlDocument html = new();
+                html.LoadHtml(await response.Content.ReadAsStringAsync());
+                HtmlNodeCollection UE_HTML = html.DocumentNode.ChildNodes;
+                List<UE> UEs = new();
+                string currYear = await GetCurrentSchoolYear(LOGIN, PASSWORD);
+
+                if (s == 2)
+                {
+                    UE_HTML = html.DocumentNode.SelectSingleNode($"//table[@id='Modules2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr");
+                }
+                else
+                {
+                    UE_HTML = html.DocumentNode.SelectSingleNode($"//table[@id='Modules1{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr");
+                    if (s == 3)
+                    {
+                        foreach (HtmlNode node in html.DocumentNode.SelectSingleNode($"//table[@id='Modules2{currYear}']").SelectSingleNode("./tbody").SelectNodes("./tr"))
+                        {
+                            UE_HTML.Add(node);
+                        }
+                    }
+                }
+
+                foreach (HtmlNode? UEN in UE_HTML)
+                {
+                    HtmlNodeCollection? UE_c = UEN.SelectNodes("./td");
+                    string? code, name, result, rank;
+                    code = UE_c.ElementAt(0).InnerText.Trim();
+                    name = UE_c.ElementAt(1).InnerText.Trim();
+                    bool e_b = float.TryParse(UE_c.ElementAt(2).InnerText.Trim().Replace(",", "."), NumberStyles.Float, CultureInfo.InvariantCulture, out float ECTS);
+                    bool g_b = float.TryParse(UE_c.ElementAt(4).InnerText.Trim().Replace(",", "."), NumberStyles.Float, CultureInfo.InvariantCulture, out float grade);
+                    bool a_b = float.TryParse(UE_c.ElementAt(5).InnerText.Trim().Replace(",", "."), NumberStyles.Float, CultureInfo.InvariantCulture, out float avg);
+                    rank = UE_c.ElementAt(6).InnerText.Trim();
+                    result = UE_c.ElementAt(7).InnerText.Trim();
+                    UEs.Add(new UE(code, name, e_b ? ECTS : -1.0f, g_b ? grade : -1.0f, a_b ? avg : -1.0f, rank, result));
+                }
+
+                return UEs;
             }
         }
 

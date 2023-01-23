@@ -25,7 +25,7 @@
 
         public override string ToString()
         {
-            return $"{_ModuleID} - {_Name}\nCoefficient: {_Coef}, Note: {_Grade}, Moyenne: {_Avg}, Rang: {_Rank}\n{_Block} - {_S}";
+            return $"{_ModuleID} - {_Name}\nCoefficient: {(_Coef>=0 ? _Coef : "-")}, Note: {(_Grade>=0 ? _Grade : "-")}, Moyenne: {(_Avg>=0 ? _Avg : "-")}, Rang: {_Rank}\nBloc: {_Block}, S2: {_S}";
         }
     }
 
