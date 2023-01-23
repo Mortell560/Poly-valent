@@ -6,14 +6,14 @@ namespace Poly_valent.Utils
 {
     internal class cal
     {
-        private static List<int> r620 = new List<int>() {
+        private static readonly List<int> r620 = new() {
             652, 832, 787, 780, 696, 736, 775, 817, 704, 712, 790, 842, 837, 819, 702, 660, 574, 741, 668
         };
         // Dans l'ordre: amphi, salles de pc, salles de td, salles de projets/platformes
 
 
-        public static Dictionary<string, List<int>> Ids_bat = new Dictionary<string, List<int>>
-                {
+        public static Dictionary<string, List<int>> Ids_bat = new()
+        {
                     { "620", r620 }
                 };
 
@@ -26,13 +26,11 @@ namespace Poly_valent.Utils
 
         public static string GetAsync(string uri)
         {
-            using (var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }))
-            {
-                client.BaseAddress = new Uri(uri);
-                HttpResponseMessage response = client.GetAsync(client.BaseAddress).Result;
-                response.EnsureSuccessStatusCode();
-                return response.Content.ReadAsStringAsync().Result;
-            }
+            using var client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate });
+            client.BaseAddress = new Uri(uri);
+            HttpResponseMessage response = client.GetAsync(client.BaseAddress).Result;
+            response.EnsureSuccessStatusCode();
+            return response.Content.ReadAsStringAsync().Result;
         }
 
         public static string GetEDTString(int id, DateTime dateS, DateTime dateF)
@@ -43,7 +41,7 @@ namespace Poly_valent.Utils
 
         public static CalendarEvent? nextClass(Calendar c, DateTime date)
         {
-            List<CalendarEvent> events = new List<CalendarEvent>();
+            List<CalendarEvent> events = new();
             foreach (CalendarEvent e in c.Events)
             {
                 DateTime d = new(e.Start.Year, e.Start.Month, e.Start.Day, e.Start.Hour, e.Start.Minute, e.Start.Second, e.Start.Millisecond);
