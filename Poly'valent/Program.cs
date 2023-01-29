@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using PolyDatabase;
+using Discord;
 using Discord.Addons.Hosting;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -59,7 +60,11 @@ namespace Poly_valent
                 .ConfigureServices((context, services) =>
                 {
                     services
-                    .AddHostedService<CommandHandler>();
+                    .AddHostedService<CommandHandler>()
+                    .AddDbContext<PolyContext>()
+                    .AddSingleton<Servers>()
+                    .AddSingleton<Grades>()
+                    .AddSingleton<Newsletters>();
                 })
                 .UseConsoleLifetime();
 
