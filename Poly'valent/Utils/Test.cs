@@ -1,6 +1,6 @@
 ﻿namespace Poly_valent.Utils
 {
-    internal class Test
+    public class Test
     {
         private List<string> months = new() { "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre" };
 

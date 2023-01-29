@@ -80,5 +80,11 @@ namespace Poly_valent.Utils
             return rooms;
         }
 
+        public static Calendar ToCalendar(string ical)
+        {
+            Calendar c = Calendar.Load(ical);
+            return c;
+        }
+
     }
 }

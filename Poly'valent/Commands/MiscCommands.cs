@@ -155,6 +155,12 @@ namespace Poly_valent.Commands
             await FollowupAsync(null, embed: b.Build(), ephemeral: true);
         }
 
+        [SlashCommand("help_edt", "", false, RunMode.Async)]
+        public async Task HelpEdtAsync()
+        {
+            await RespondAsync("https://mortell560.notion.site/Aide-pour-trouver-id-7515ae00658b4b2e917228c8e5b2407f");
+        }
+
 
         [SlashCommand("shut", "shuts the bot", false, RunMode.Async)]
         [RequireOwner]
