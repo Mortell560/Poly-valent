@@ -6,18 +6,18 @@ namespace Poly_valent.Utils
 {
     internal class cal
     {
-        private static readonly List<int> r620 = new() {
+        private static readonly List<ulong> r620 = new() {
             652, 832, 787, 780, 696, 736, 775, 817, 704, 712, 790, 842, 837, 819, 702, 660, 574, 741, 668
         };
         // Dans l'ordre: amphi, salles de pc, salles de td, salles de projets/platformes
 
 
-        public static Dictionary<string, List<int>> Ids_bat = new()
+        public static Dictionary<string, List<ulong>> Ids_bat = new()
         {
                     { "620", r620 }
                 };
 
-        public static Calendar GetEDT(int id, DateTime dateS, DateTime dateF)
+        public static Calendar GetEDT(ulong id, DateTime dateS, DateTime dateF)
         {
             string url = $"https://ade-planning.polytech.universite-paris-saclay.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources={id}&projectId=5&calType=ical&lastDate={dateF.Year}-{dateF.Month}-{dateF.Day}&firstDate={dateS.Year}-{dateS.Month}-{dateS.Day}";
             Calendar c = Calendar.Load(GetAsync(url));
@@ -33,7 +33,7 @@ namespace Poly_valent.Utils
             return response.Content.ReadAsStringAsync().Result;
         }
 
-        public static string GetEDTString(int id, DateTime dateS, DateTime dateF)
+        public static string GetEDTString(ulong id, DateTime dateS, DateTime dateF)
         {
             string url = $"https://ade-planning.polytech.universite-paris-saclay.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources={id}&projectId=5&calType=ical&lastDate={dateF.Year}-{dateF.Month}-{dateF.Day}&firstDate={dateS.Year}-{dateS.Month}-{dateS.Day}";
             return GetAsync(url);
@@ -62,7 +62,7 @@ namespace Poly_valent.Utils
             List<string> rooms = new();
             foreach (string bat in bats)
             {
-                foreach (int roomId in Ids_bat[bat])
+                foreach (ulong roomId in Ids_bat[bat])
                 {
                     Calendar c = GetEDT(roomId, DateTime.Now, DateTime.Now);
                     foreach (CalendarEvent e in c.Events)

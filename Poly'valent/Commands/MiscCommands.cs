@@ -24,7 +24,7 @@ namespace Poly_valent.Commands
 
 
         [SlashCommand("nextclass", "tells you your next class", false, RunMode.Async)]
-        public async Task NextClass(int id)
+        public async Task NextClass(ulong id)
         {
             Calendar c = cal.GetEDT(id, DateTime.Now, DateTime.Now.AddDays(3));
             if (c == null)

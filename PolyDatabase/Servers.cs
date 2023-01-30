@@ -51,5 +51,11 @@
             s.NewsChannel = newsId;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> ExistsInDB(ulong id)
+        {
+            Server? s = await _context.Servers.FindAsync(id);
+            return s != null;
+        }
     }
 }

@@ -65,5 +65,11 @@ namespace PolyDatabase
             Calendar c = new();
             return c;
         }
+
+        public async Task<bool> ExistsInDB(ulong userId)
+        {
+            Newsletter? n = await _context.Newsletters.FindAsync(userId);
+            return n != null;
+        }
     }
 }
