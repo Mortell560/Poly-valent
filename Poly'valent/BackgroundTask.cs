@@ -85,7 +85,7 @@ namespace Poly_valent
                 foreach (Test x in diff)
                 {
 #pragma warning disable CS8604 // Possible null reference argument.
-                    await _grades.AddGrade(x._name, x._subject, x._subject_id, x._grade == null ? -1.0f : (float)x._grade, x._class_avg == null ? -1.0f : (float)x._class_avg, x._rank, x._date_str, x._appr);
+                    await _grades.AddGrade(x._name, x._subject, x._subject_id, x._grade ?? -1.0f, x._class_avg ?? -1.0f, x._rank, x._date_str, x._appr);
 #pragma warning restore CS8604 // Possible null reference argument.
                 }
             }
@@ -95,7 +95,7 @@ namespace Poly_valent
                 List<Test> new_g = await Utils.Grades.GetGrades(_config.GetValue<string>("studentId"), _config.GetValue<string>("password"), 3);
                 foreach (var x in new_g)
                 {
-                    await _grades.AddGrade(x._name, x._subject, x._subject_id, x._grade == null ? -1.0f : (float)x._grade, x._class_avg == null ? -1.0f : (float)x._class_avg, x._rank, x._date_str, x._appr);
+                    await _grades.AddGrade(x._name, x._subject, x._subject_id, x._grade ?? -1.0f, x._class_avg ?? -1.0f, x._rank, x._date_str, x._appr);
                 }
                 Console.WriteLine("Initial start");
 #pragma warning restore CS8604 // Possible null reference argument.
