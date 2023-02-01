@@ -14,7 +14,7 @@ namespace Poly_valent
     public class BackgroundTask : IHostedService, IDisposable
     {
         private Timer? _timer = null;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
         private readonly Servers _servers;
         private readonly PolyDatabase.Grades _grades;
         private readonly Newsletters _newsletters;
@@ -123,13 +123,12 @@ namespace Poly_valent
                     foreach (CalendarEvent ev in l_diff1)
                     {
 
-                        string descTemp = ev.Description.Remove(0, 2);
-                        string[] desc = descTemp.Split('\n');
+                        string[] desc = ev.Description.Split('\n');
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Nouveau cours:")
                             .AddField("Cours", ev.Summary, false)
                             .AddField("Professeur(s)", desc[0], false)
-                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1).SkipLast(2)))
+                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)))
                             .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString())
                             .AddField("Lieu", ev.Location)
                             .WithFooter($"{DateTime.Now}");
@@ -142,13 +141,12 @@ namespace Poly_valent
                     foreach (CalendarEvent ev in l_diff2)
                     {
 
-                        string descTemp = ev.Description.Remove(0, 2);
-                        string[] desc = descTemp.Split('\n');
+                        string[] desc = ev.Description.Split('\n');
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Cours supprimé:")
                             .AddField("Cours", ev.Summary, false)
                             .AddField("Professeur(s)", desc[0], false)
-                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1).SkipLast(2)))
+                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)))
                             .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString())
                             .AddField("Lieu", ev.Location)
                             .WithFooter($"{DateTime.Now}");
