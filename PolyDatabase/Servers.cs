@@ -57,5 +57,10 @@
             Server? s = await _context.Servers.FindAsync(id);
             return s != null;
         }
+
+        public async Task<List<Server>> GetServersAsync()
+        {
+            return await Task.FromResult(_context.Servers.ToList());
+        }
     }
 }

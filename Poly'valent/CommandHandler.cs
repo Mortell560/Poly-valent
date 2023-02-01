@@ -47,7 +47,7 @@ namespace Poly_valent
             await _interaction.RegisterCommandsToGuildAsync(_config.GetValue<ulong>("guildtest"));
 #else
             await _interaction.RegisterCommandsGloballyAsync();
-#endif
+#endif            
         }
 
         private async Task HandleInteraction(SocketInteraction arg)
@@ -55,7 +55,7 @@ namespace Poly_valent
             try
             {
                 // Create an execution context that matches the generic type parameter of your InteractionModuleBase<T> modules
-                SocketInteractionContext ctx = new SocketInteractionContext(Client, arg);
+                SocketInteractionContext ctx = new(Client, arg);
                 await _interaction.ExecuteCommandAsync(ctx, _provider);
             }
             catch (Exception ex)

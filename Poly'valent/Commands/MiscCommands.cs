@@ -6,6 +6,7 @@ using Ical.Net.CalendarComponents;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Poly_valent.Utils;
+using PolyDatabase;
 
 namespace Poly_valent.Commands
 {
@@ -13,15 +14,34 @@ namespace Poly_valent.Commands
     {
         private readonly DiscordSocketClient _client;
         private readonly IHost _host;
+        private readonly Newsletters _newsletters;
         private readonly IConfiguration _configuration;
 
-        public MiscCommands(DiscordSocketClient client, IHost host, IConfiguration configuration)
+        public MiscCommands(DiscordSocketClient client, IHost host, IConfiguration configuration, Newsletters newsletters)
         {
             _client = client;
             _host = host;
             _configuration = configuration;
+            _newsletters = newsletters;
         }
 
+
+        [SlashCommand("newsletter_edt", "will warn you about edt changes")]
+        public async Task SetNewsletter_edt(ulong id)
+        {
+            await DeferAsync();
+#pragma warning disable CS8604 // Possible null reference argument.
+            string y = await Utils.Grades.GetCurrentSchoolYear(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"));
+#pragma warning restore CS8604 // Possible null reference argument.
+            if (await _newsletters.ExistsInDB(Context.User.Id))
+            {
+                await _newsletters.RemoveNewsletterAsync(Context.User.Id); // If we don't put this the user will get spammed once they change
+                await _newsletters.AddNewsletterAsync(Context.User.Id, id, cal.GetEDTString(id, DateTime.UtcNow, new DateTime(int.Parse(y) + 1, 7, 28)));
+            }
+            else
+                await _newsletters.AddNewsletterAsync(Context.User.Id, id, cal.GetEDTString(id, DateTime.UtcNow, new DateTime(int.Parse(y)+1, 7, 28)));
+            await FollowupAsync($"you'll receive all news of the EDT with the following id: {id}");
+        }
 
         [SlashCommand("nextclass", "tells you your next class", false, RunMode.Async)]
         public async Task NextClass(ulong id)
@@ -57,7 +77,7 @@ namespace Poly_valent.Commands
         [SlashCommand("findoccupiedroom", "finds all occupied rooms", false, RunMode.Async)]
         public async Task FindOccupiedAsync(string bats)
         {
-            List<string> list = new List<string>();
+            List<string> list = new();
             list.AddRange(bats.Split(" ").Where(x => cal.Ids_bat.ContainsKey(x)));
             await DeferAsync(); // The command needs about 3-5 seconds to answer and 3s is the max delay to acknowledge an interaction hence why we're using this
             DateTime d = DateTime.Now;
@@ -80,7 +100,7 @@ namespace Poly_valent.Commands
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
-            List<Test> c = await Grades.GetGrades(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+            List<Test> c = await Utils.Grades.GetGrades(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
 #pragma warning restore CS8604 // Possible null reference argument.
             string desc = "";
             c = c.OrderBy(x => x._date).ToList();
@@ -107,7 +127,7 @@ namespace Poly_valent.Commands
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
-            Dictionary<string, List<Module>> d = await Grades.GetModules(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+            Dictionary<string, List<Module>> d = await Utils.Grades.GetModules(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
 #pragma warning restore CS8604 // Possible null reference argument.
             string desc = "";
             if (sortName != null)
@@ -134,7 +154,7 @@ namespace Poly_valent.Commands
         {
             await DeferAsync();
 #pragma warning disable CS8604 // Possible null reference argument.
-            List<UE> c = await Grades.GetUE(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
+            List<UE> c = await Utils.Grades.GetUE(_configuration.GetValue<string>("studentId"), _configuration.GetValue<string>("password"), s);
 #pragma warning restore CS8604 // Possible null reference argument.
             string desc = "";
             c = c.OrderBy(x => x._code).ToList();
@@ -155,7 +175,7 @@ namespace Poly_valent.Commands
             await FollowupAsync(null, embed: b.Build(), ephemeral: true);
         }
 
-        [SlashCommand("help_edt", "", false, RunMode.Async)]
+        [SlashCommand("help_edt", "Helps you ?", false, RunMode.Async)]
         public async Task HelpEdtAsync()
         {
             await RespondAsync("https://mortell560.notion.site/Aide-pour-trouver-id-7515ae00658b4b2e917228c8e5b2407f");

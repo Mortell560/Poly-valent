@@ -28,6 +28,25 @@
             _rank = rank;
         }
 
+        private sealed class TestComparer : IEqualityComparer<Test>
+        {
+            public bool Equals(Test? x, Test? y)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                return (x._subject_id == y._subject_id) && (x._name == y._name) && (x._grade == y._grade) && (x._date == y._date) && (x._appr == y._appr) && (x._class_avg == y._class_avg) && (x._rank == y._rank);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+
+            public int GetHashCode(Test obj)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                return obj._subject_id.GetHashCode() ^ obj._name.GetHashCode();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            }
+        }
+
+        public static IEqualityComparer<Test> Comparer { get; } = new TestComparer();
+
         private DateTime _ConvertDate(string date_str)
         {
             string[] a = date_str.Split(" ");

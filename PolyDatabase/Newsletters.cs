@@ -1,5 +1,4 @@
 ﻿using Ical.Net;
-using Ical.Net.CalendarComponents;
 
 namespace PolyDatabase
 {
@@ -70,6 +69,21 @@ namespace PolyDatabase
         {
             Newsletter? n = await _context.Newsletters.FindAsync(userId);
             return n != null;
+        }
+
+        public async Task<List<Tuple<ulong, ulong>>> GetAllIdsAsync()
+        {
+            List<Tuple<ulong, ulong>> l = new();
+            foreach (Newsletter n in _context.Newsletters)
+            {
+                l.Add(new(n.UserId, n.Id));
+            }
+            return await Task.FromResult(l);
+        }
+
+        public async Task<List<Newsletter>> GetAllNewslettersAsync()
+        {
+            return await Task.FromResult(_context.Newsletters.ToList());
         }
     }
 }

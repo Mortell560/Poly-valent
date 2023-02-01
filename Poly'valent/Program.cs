@@ -14,7 +14,6 @@ namespace Poly_valent
 {
     class Program
     {
-
         static async Task Main()
         {
             IHostBuilder builder = new HostBuilder()
@@ -61,6 +60,7 @@ namespace Poly_valent
                 {
                     services
                     .AddHostedService<CommandHandler>()
+                    .AddHostedService<BackgroundTask>()
                     .AddDbContext<PolyContext>()
                     .AddSingleton<Servers>()
                     .AddSingleton<Grades>()
@@ -70,8 +70,7 @@ namespace Poly_valent
 
             IHost host = builder.Build();
             await host.RunAsync();
-
-
+            
         }
 
         /// <summary>

@@ -13,9 +13,13 @@ namespace Poly_valent.Commands
             _newsletters = newsletters;
             _configuration = configuration;
         }
-        
+
         [SlashCommand("edtupdates", "The bot will warn you about edt changes")]
-        public async Task AddEDTPerson() => await Context.Interaction.RespondWithModalAsync<AddEDT>("edt");
+        [RequireOwner] // doesn't work
+        public async Task AddEDTPerson() 
+        {
+            await Context.Interaction.RespondWithModalAsync<AddEDT>("edt"); 
+        }
 
         [ModalInteraction("edt")]
         public async Task ModalResponse(AddEDT modal)
@@ -33,7 +37,7 @@ namespace Poly_valent.Commands
                 await _newsletters.ChangeIdAsync(Context.User.Id, id);
             else
                 await _newsletters.AddNewsletterAsync(Context.User.Id, id, Utils.cal.GetEDTString(id, DateTime.UtcNow, new DateTime(int.Parse(y), 7, 28)));
-            await RespondAsync($"you'll receive all news of the EDT with the following id: {modal.Id}");
+            await Context.Channel.SendMessageAsync($"you'll receive all news of the EDT with the following id: {modal.Id}");
         }
 
         public class AddEDT : IModal

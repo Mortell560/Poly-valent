@@ -12,6 +12,12 @@
 
         public async Task AddGrade(string name, string subject, string subject_id, float grade, float class_avg, string rank, string date_str, string appr)
         {
+            if (await _context.Grades.FindAsync(name, subject_id) != null) 
+            { 
+                await ModifyGrade(name, subject_id, grade, class_avg, rank, appr);
+                await _context.SaveChangesAsync();
+                return;
+            }
             await _context.AddAsync(new Grade
             {
                 Name = name,
