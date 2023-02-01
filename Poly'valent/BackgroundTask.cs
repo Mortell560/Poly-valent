@@ -68,7 +68,7 @@ namespace Poly_valent
                     {
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Update")
-                            .AddField("Actuellement disponible sur OASIS:", $"{t._name} - {t._subject} - {t._subject_id}\n{t._date} - {t._class_avg}")
+                            .AddField("Actuellement disponible sur OASIS:", $"{t._name} - {t._subject} - {t._subject_id}\n{t._date} - {(t._class_avg < 0 ? "-" : t._class_avg)}")
                             .WithFooter($"{DateTime.Now}");
                         Embed e = b.Build();
 
@@ -126,11 +126,11 @@ namespace Poly_valent
                         string[] desc = ev.Description.Split('\n');
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Nouveau cours:")
-                            .AddField("Cours", ev.Summary, false)
-                            .AddField("Professeur(s)", desc[0], false)
-                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)))
-                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString())
-                            .AddField("Lieu", ev.Location)
+                            .AddField("Cours", ev.Summary ?? " ", false)
+                            .AddField("Professeur(s)", desc[0] ?? " ", false)
+                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)) ?? " ")
+                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString() ?? " ")
+                            .AddField("Lieu", ev.Location ?? " ")
                             .WithFooter($"{DateTime.Now}");
                         await UpdateEDTMessage(b.Build(), n.UserId);
                     }
@@ -144,11 +144,11 @@ namespace Poly_valent
                         string[] desc = ev.Description.Split('\n');
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Cours supprimé:")
-                            .AddField("Cours", ev.Summary, false)
-                            .AddField("Professeur(s)", desc[0], false)
-                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)))
-                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString())
-                            .AddField("Lieu", ev.Location)
+                            .AddField("Cours", ev.Summary ?? " ", false)
+                            .AddField("Professeur(s)", desc[0] ?? " ", false)
+                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)) ?? " ")
+                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString() ?? " ")
+                            .AddField("Lieu", ev.Location ?? " ")
                             .WithFooter($"{DateTime.Now}");
                         await UpdateEDTMessage(b.Build(), n.UserId);
                     }
