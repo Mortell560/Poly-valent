@@ -46,17 +46,18 @@ namespace Poly_valent.Commands
         [SlashCommand("nextclass", "tells you your next class", false, RunMode.Async)]
         public async Task NextClass(ulong id)
         {
+            await DeferAsync();
             Calendar c = cal.GetEDT(id, DateTime.Now, DateTime.Now.AddDays(3));
             if (c == null)
             {
-                await RespondAsync("Tu n'as pas de cours pour 3j au moins");
+                await FollowupAsync("Tu n'as pas de cours pour 3j au moins");
                 return;
             }
             CalendarEvent? e = cal.nextClass(c, DateTime.Now);
 
             if(e == null)
             {
-                await RespondAsync("Tu n'as pas de prochains cours");
+                await FollowupAsync("Tu n'as pas de prochains cours");
                 return;
             }
 
@@ -70,7 +71,7 @@ namespace Poly_valent.Commands
                 .AddField("Date", e.Start.ToTimeZone("France/Paris").ToString())
                 .AddField("Lieu", e.Location)
                 .WithFooter($"Command executed by {Context.User.Username} at {DateTime.Now}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
-            await RespondAsync(null, embed: b.Build());
+            await FollowupAsync(null, embed: b.Build());
             
         }
 
