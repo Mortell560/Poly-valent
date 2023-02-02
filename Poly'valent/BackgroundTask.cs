@@ -68,7 +68,8 @@ namespace Poly_valent
                     {
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Update")
-                            .AddField("Actuellement disponible sur OASIS:", $"{t._name} - {t._subject} - {t._subject_id}\n{t._date} - {(t._class_avg < 0 ? "-" : t._class_avg)}")
+                            .AddField("Actuellement disponible sur OASIS:", $"{t._name} - {t._subject} - {t._subject_id}\n{t._date} - {(t._class_avg < 0 ? "-" : t._class_avg)}\n")
+                            .WithDescription("@everyone")
                             .WithFooter($"{DateTime.Now}");
                         Embed e = b.Build();
 
@@ -115,8 +116,8 @@ namespace Poly_valent
                 Calendar new_c = cal.GetEDT(n.Id, DateTime.UtcNow, new DateTime(int.Parse(y)+1, 7, 28));
                 List<CalendarEvent> l1 = old_c.Events.ToList();
                 List<CalendarEvent> l2 = new_c.Events.ToList();
-                l1.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split().SkipLast(2)));
-                l2.ForEach(x => x.Description = string.Join("\n", x.Description.Remove(0, 2).Split().SkipLast(2)));
+                l1.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
+                l2.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
                 List<CalendarEvent> l_diff1 = l2.Except(l1).ToList();
                 if (l_diff1.Count > 0)
                 {
@@ -126,11 +127,11 @@ namespace Poly_valent
                         string[] desc = ev.Description.Split('\n');
                         EmbedBuilder b = new EmbedBuilder()
                             .WithTitle("Nouveau cours:")
-                            .AddField("Cours", ev.Summary ?? " ", false)
-                            .AddField("Professeur(s)", desc[0] ?? " ", false)
-                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)) ?? " ")
-                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString() ?? " ")
-                            .AddField("Lieu", ev.Location ?? " ")
+                            .AddField("Cours", ev.Summary ?? "-", false)
+                            .AddField("Professeur(s)", desc[0] ?? "-", false)
+                            .AddField("Participant(s)", string.Join("\n", desc.Skip(1)) ?? "-")
+                            .AddField("Date", ev.Start.ToTimeZone("France/Paris").ToString() ?? "-")
+                            .AddField("Lieu", ev.Location ?? "-")
                             .WithFooter($"{DateTime.Now}");
                         await UpdateEDTMessage(b.Build(), n.UserId);
                     }
@@ -176,7 +177,7 @@ namespace Poly_valent
         {
             SocketGuild g = _client.GetGuild(id);
             SocketTextChannel c = g.GetTextChannel(channel);
-            await c.SendMessageAsync(embed: e);
+            await c.SendMessageAsync(embed: e, allowedMentions: AllowedMentions.All);
         }
         public async Task UpdateEDTMessage(Embed e, ulong id)
         {
