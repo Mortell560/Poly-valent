@@ -14,7 +14,7 @@ namespace Poly_valent
     public class BackgroundTask : IHostedService, IDisposable
     {
         private Timer? _timer = null;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(10);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
         private readonly Servers _servers;
         private readonly PolyDatabase.Grades _grades;
         private readonly Newsletters _newsletters;
@@ -114,7 +114,7 @@ namespace Poly_valent
             {
                 Calendar old_c = cal.ToCalendar(n.Calendar ?? "");
                 Calendar new_c = cal.GetEDT(n.Id, DateTime.UtcNow, new DateTime(int.Parse(y)+1, 7, 28));
-                List<CalendarEvent> l1 = old_c.Events.Where(x => x.DtStart.AsUtc >= DateTime.UtcNow).ToList();
+                List<CalendarEvent> l1 = old_c.Events.Where(x => x.DtStart.Date >= DateTime.UtcNow.Date).ToList();
                 List<CalendarEvent> l2 = new_c.Events.ToList();
                 l1.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
                 l2.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
