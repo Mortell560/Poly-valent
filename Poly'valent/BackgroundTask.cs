@@ -114,7 +114,7 @@ namespace Poly_valent
             {
                 Calendar old_c = cal.ToCalendar(n.Calendar ?? "");
                 Calendar new_c = cal.GetEDT(n.Id, DateTime.UtcNow, new DateTime(int.Parse(y)+1, 7, 28));
-                List<CalendarEvent> l1 = old_c.Events.ToList();
+                List<CalendarEvent> l1 = old_c.Events.Where(x => x.DtStart.AsUtc >= DateTime.UtcNow).ToList();
                 List<CalendarEvent> l2 = new_c.Events.ToList();
                 l1.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
                 l2.ForEach(x => x.Description = string.Join("\n",x.Description.Remove(0, 2).Split('\n').SkipLast(2)));
