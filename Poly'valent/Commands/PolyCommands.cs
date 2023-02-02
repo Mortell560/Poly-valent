@@ -53,5 +53,15 @@ namespace Poly_valent.Commands
             await RespondAsync("done");
         }
 
+        [SlashCommand("get_id_edt", "gets your id if you forgor it")]
+        public async Task ForgorAsync()
+        {
+            if (await _newsletters.ExistsInDB(Context.User.Id))
+            {
+                await RespondAsync($"your id is: {await _newsletters.GetIdAsync(Context.User.Id)}");
+            }
+            await RespondAsync("you don't have any id, use the /newsletter_edt command");
+        }
+
     }
 }

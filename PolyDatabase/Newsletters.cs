@@ -85,5 +85,15 @@ namespace PolyDatabase
         {
             return await Task.FromResult(_context.Newsletters.ToList());
         }
+
+        public async Task<ulong> GetIdAsync(ulong userId)
+        {
+            Newsletter? n = await _context.Newsletters.FindAsync(userId);
+            if (n != null)
+            {
+                return n.Id;
+            }
+            return 0;
+        }
     }
 }

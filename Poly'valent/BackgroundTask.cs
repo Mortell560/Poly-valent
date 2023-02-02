@@ -14,7 +14,7 @@ namespace Poly_valent
     public class BackgroundTask : IHostedService, IDisposable
     {
         private Timer? _timer = null;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(10);
         private readonly Servers _servers;
         private readonly PolyDatabase.Grades _grades;
         private readonly Newsletters _newsletters;
